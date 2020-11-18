@@ -695,9 +695,9 @@ class Connection(object):
         """
         self.rollback()
         try:
+            # do nothing instead of throwing error
             if self.conn_handler is None:
-                raise ProgrammingError("Connection cannot be closed; "
-                                     "connection is no longer active.")
+                    return None
             else:
                 return_value = ibm_db.close(self.conn_handler)
         except Exception as inst:
