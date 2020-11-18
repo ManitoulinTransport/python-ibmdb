@@ -697,7 +697,7 @@ class Connection(object):
         try:
             # do nothing instead of throwing error
             if self.conn_handler is None:
-                    return None
+                return None
             else:
                 return_value = ibm_db.close(self.conn_handler)
         except Exception as inst:
@@ -1154,8 +1154,7 @@ class Cursor(object):
         """
         messages = []
         if self.conn_handler is None:
-            self.messages.append(ProgrammingError("Cursor cannot be closed; connection is no longer active."))
-            raise self.messages[len(self.messages) - 1]
+            return None
         try:
             return_value = ibm_db.free_stmt(self.stmt_handler)
         except Exception as inst:
