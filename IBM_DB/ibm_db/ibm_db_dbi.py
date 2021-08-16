@@ -210,7 +210,7 @@ def Binary(string):
     inserting it into a binary type column in the database.
 
     """
-    if not isinstance( string, (types.StringType, types.BufferType) ):
+    if not isinstance( string, (bytes, memoryview) ):
         raise InterfaceError("Binary function expects type string argument.")
     return buffer(string)
 
@@ -290,6 +290,8 @@ DATETIME = DBAPITypeObject(("TIMESTAMP",))
 
 ROWID = DBAPITypeObject(())
 
+BOOLEAN = DBAPITypeObject(("BOOLEAN",))
+
 # This method is used to determine the type of error that was
 # generated.  It takes an exception instance as an argument, and
 # returns exception object of the appropriate type.
@@ -366,9 +368,14 @@ def _get_exception(inst):
     # return the generic Error exception.
     if inst is not None:
         message = repr(inst)
-        if message.startswith("Exception('") and message.endswith("',)"):
-            message = message[11:]
-            message = message[:len(message)-3]
+        if message.startswith("Exception('"):
+            if message.endswith("',)"):  # python 2
+                message = message[11:]
+                message = message[:len(message)-3]
+            elif message.endswith("')"): # python 3
+                message = message[11:]
+                message = message[:len(message)-2]
+
 
         index = message.find('SQLSTATE=')
         if( message != '') & (index != -1):
@@ -419,6 +426,25 @@ def _get_exception(inst):
          prefix_code in not_supported_error_tuple ):
         return NotSupportedError(message)
     return DatabaseError(message)
+
+
+def _retrieve_current_schema(dsn):
+    """This method retrieve the value of ODBC keyword CURRENTSCHEMA from DSN
+    """
+
+    ODBC_CURRENTSCHEMA_KEYWORD = 'CURRENTSCHEMA='
+    current_schema_value = None
+    current_schema_start = dsn.find(ODBC_CURRENTSCHEMA_KEYWORD)
+
+    if current_schema_start > -1:
+        current_schema_end = dsn.find(';', current_schema_start)
+        current_schema_value = dsn[
+            (current_schema_start + len(ODBC_CURRENTSCHEMA_KEYWORD))
+            :current_schema_end
+        ]
+
+    return current_schema_value
+
 
 def _server_connect(dsn, user='', password='', host=''):
     """This method create connection with server
@@ -595,13 +621,14 @@ def connect(dsn, user='', password='', host='', database='', conn_options=None):
         dsn = dsn + "UID=" + user + ";"
     if password != '' and dsn.find('PWD=') == -1:
         dsn = dsn + "PWD=" + password + ";"
+
     try:
         conn = ibm_db.connect(dsn, '', '', conn_options)
-        ibm_db.set_option(conn, {SQL_ATTR_CURRENT_SCHEMA : user}, 1)
+        conn_object = Connection(conn)
+        conn_object.set_current_schema(_retrieve_current_schema(dsn) or user)
+        return conn_object
     except Exception as inst:
         raise _get_exception(inst)
-
-    return Connection(conn)
 
 def pconnect(dsn, user='', password='', host='', database='', conn_options=None):
     """This method creates persistent connection to the database. It returns
@@ -647,11 +674,11 @@ def pconnect(dsn, user='', password='', host='', database='', conn_options=None)
         dsn = dsn + "PWD=" + password + ";"
     try:
         conn = ibm_db.pconnect(dsn, '', '', conn_options)
-        ibm_db.set_option(conn, {SQL_ATTR_CURRENT_SCHEMA : user}, 1)
+        conn_object = Connection(conn)
+        conn_object.set_current_schema(_retrieve_current_schema(dsn) or user)
+        return conn_object
     except Exception as inst:
         raise _get_exception(inst)
-
-    return Connection(conn)
 
 class Connection(object):
     """This class object represents a connection between the database
@@ -1073,6 +1100,8 @@ class Cursor(object):
                     column_desc.append(DATETIME)
                 elif ROWID == type:
                     column_desc.append(ROWID)
+                elif BOOLEAN == type:
+                    column_desc.append(BOOLEAN)
 
                 column_desc.append(ibm_db.field_display_size(
                                              self.stmt_handler, column_index))
@@ -1154,6 +1183,11 @@ class Cursor(object):
         """
         messages = []
         if self.conn_handler is None:
+            '''
+            Changes for django
+            '''
+            # self.messages.append(ProgrammingError("Cursor cannot be closed; connection is no longer active."))
+            # raise self.messages[len(self.messages) - 1]
             return None
         try:
             return_value = ibm_db.free_stmt(self.stmt_handler)
@@ -1208,14 +1242,14 @@ class Cursor(object):
             self.messages.append(InterfaceError("callproc expects the first argument to be of type String or Unicode."))
             raise self.messages[len(self.messages) - 1]
         if parameters is not None:
-            if not isinstance(parameters, (types.ListType, types.TupleType)):
+            if not isinstance(parameters, (list, tuple)):
                 self.messages.append(InterfaceError("callproc expects the second argument to be of type list or tuple."))
                 raise self.messages[len(self.messages) - 1]
         result = self._callproc_helper(procname, parameters)
         return_value = None
         self.__description = None
         self._all_stmt_handlers = []
-        if isinstance(result, types.TupleType):
+        if isinstance(result, tuple):
             self.stmt_handler = result[0]
             return_value = result[1:]
         else:
@@ -1360,7 +1394,7 @@ class Cursor(object):
             self.messages.append(InterfaceError("execute expects the first argument [%s] to be of type String or Unicode." % operation ))
             raise self.messages[len(self.messages) - 1]
         if parameters is not None:
-            if not isinstance(parameters, (types.ListType, types.TupleType, types.DictType)):
+            if not isinstance(parameters, (list, tuple, dict)):
                 self.messages.append(InterfaceError("execute parameters argument should be sequence."))
                 raise self.messages[len(self.messages) - 1]
         self.__description = None
@@ -1385,7 +1419,7 @@ class Cursor(object):
             self.messages.append(InterfaceError("executemany expects a not None seq_parameters value"))
             raise self.messages[len(self.messages) - 1]
 
-        if not isinstance(seq_parameters, (types.ListType, types.TupleType)):
+        if not isinstance(seq_parameters, (list, tuple)):
             self.messages.append(InterfaceError("executemany expects the second argument to be of type list or tuple of sequence."))
             raise self.messages[len(self.messages) - 1]
 

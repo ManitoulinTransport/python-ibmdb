@@ -27,6 +27,8 @@ Provides Python interface for connecting to IBM DB2 and Informix
 
 [Contributing to the ibm_db python project](#contributing-to-the-ibm_db-python-project)
 
+[Some common issues](#KnownIssues)
+
 <a name='components'></a>
 ## Components
 
@@ -35,8 +37,9 @@ Provides Python interface for connecting to IBM DB2 and Informix
    * **ibm_db_dbi**: Python driver for IBM DB2 and IBM Informix databases that complies to the DB-API 2.0 specification.
    Checkout the [README](https://github.com/ibmdb/python-ibmdb/tree/master/IBM_DB/ibm_db) for getting started with ibm_db and ibm_db_dbi
 
-## <a name="prereq"></a> Pre-requisites
-Install Python 2.7 or Python 3 <= 3.8. The minimum python version supported by driver is python 2.7 and the latest version supported is python 3.8 except version 3.3 as it has reached end-of-life.
+<a name="prereq"></a>
+## Pre-requisites
+Install Python 2.7 or Python 3 <= 3.9. The minimum python version supported by driver is python 2.7 and the latest version supported is python 3.9 except version 3.3 as it has reached end-of-life.
 
 The pre-built 32-bit and 64-bit binaries on windows are available for the following versions:
 ```
@@ -46,9 +49,13 @@ python 3.5
 python 3.6
 python 3.7
 python 3.8
+python 3.9
 ```
 
 You might need zlib, openssl, pip installations if not already available in your setup.
+
+* Z/OS:
+  In case of any issues using Python on zO/S, refer to this [file](install.md) and also refer to this [doc](https://github.com/ibmdb/node-ibm_db#configure-odbc-driver-on-zos).
 
 * Linux/Unix:
   If you face problems due to missing python header files while installing the driver, you would need to install python developer package and retry install. e.g:
@@ -64,7 +71,8 @@ You might need zlib, openssl, pip installations if not already available in your
 
 * For installing ibm_db on **Docker Linux container**, you may need to install **gcc, python, pip, python-devel, libxml2 and pam** if not already installed. Refer to [Installation](#docker) for more details.
 
-## <a name="inst"></a> Installation
+<a name="inst"></a> 
+## Installation
 
 You can install the driver using pip as:
 
@@ -73,7 +81,7 @@ pip install ibm_db
 ```
 This will install ibm_db and ibm_db_dbi module.
 
-If you are using python 3.8 on windows and building the source manually, you will need to set dll path of dependent library of clidriver before importing the module as:
+If you are using python 3.8 or 3.9 on windows and building the source manually, you will need to set dll path of dependent library of clidriver before importing the module as:
 ```
 import os
 os.add_dll_directory('path to clidriver installation until bin')
@@ -206,6 +214,26 @@ True
 >>> ibm_db.close(ibm_db_conn)
 True
 ```
+
+## Example of SSL Connection String
+ 
+```
+Using SSLServerCertificate keyword
+ 
+conn = ibm_db.connect("DATABASE=<DATABASE_NAME>;HOSTNAME=<HOSTNAME>;PORT=<SSL_PORT>;SECURITY=SSL;SSLServerCertificate=<FULL_PATH_TO_SERVER_CERTIFICATE>;UID=<USER_ID>;PWD=<PASSWORD>",'','')
+```
+ 
+```
+Using SSLClientKeyStoreDB and SSLClientKeyStoreDBPassword keyword
+ 
+conn = ibm_db.connect("DATABASE=<DATABASE_NAME>;HOSTNAME=<HOSTNAME>;PORT=<SSL_PORT>;SECURITY=SSL;SSLClientKeyStoreDB=<FULL_PATH_TO_CLIENT_KEY_STORE_DB>;SSLClientKeyStoreDBPassword=<KEYSTORE_PASSWORD>;UID=<USER_ID>;PWD=<PASSWORD>",'','')
+```
+ 
+```
+Using SSLClientKeyStoreDB and SSLClientKeyStash keyword
+ 
+conn = ibm_db.connect("DATABASE=<DATABASE_NAME>;HOSTNAME=<HOSTNAME>;PORT=<SSL_PORT>;SECURITY=SSL;SSLClientKeyStoreDB=<FULL_PATH_TO_CLIENT_KEY_STORE_DB>;SSLClientKeyStash=<FULL_PATH_TO_CLIENT_KEY_STASH>;UID=<USER_ID>;PWD=<PASSWORD>",'','')
+```
 More examples can be found under ['tests'](https://github.com/ibmdb/python-ibmdb/tree/master/IBM_DB/ibm_db/tests) folder.
 
 [API Documentation](https://github.com/ibmdb/python-ibmdb/wiki/APIs) has examples for each API.
@@ -267,7 +295,7 @@ git clone git@github.com:ibmdb/python-ibmdb.git
 ## Latest Updates
 
 ### *Updated ibm_db*
-  June 17, 2020: A new release 3.0.2 of ibm_db and ibm_db_dbi available.
+  Apr 12, 2021: A new release 3.0.4 of ibm_db and ibm_db_dbi available.
 
 
 <a name='support'></a>
@@ -286,3 +314,23 @@ See [CONTRIBUTING](https://github.com/ibmdb/python-ibmdb/blob/master/contributin
 The developer sign-off should include the reference to the DCO in remarks(example below):
 DCO 1.1 Signed-off-by: Random J Developer <random@developer.org>
 ```
+
+<a name='KnownIssues'></a>
+## Some common issues
+
+## 1. Installation Issues for missing python.h file
+
+### Always use the latest pip
+```python3 -m pip install --upgrade pip```
+
+### Install the package python3-dev that delivers the python.h header file
+```
+For RHEL use
+yum install python3-dev
+```
+```
+For Ubuntu use
+apt-get install python3-dev
+```
+
+### Once the above steps goes through fine, try re-installing ibm_db.
