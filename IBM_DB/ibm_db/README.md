@@ -2,7 +2,7 @@
 
 We are assuming that you have Python already installed. In Linux you may need the python-dev package (you can install python-dev package through "$yum install python-devel" if yum doesn't work then you can also install it through "$apt-get install python-dev")
 
-Note:The minimum python version supported by driver is python 2.7 and the latest version supported is python 3.7 except version 3.3 as it has reached end-of-life.
+Note:The minimum python version supported by driver is python 2.7 and the latest version supported is python 3.9 except version 3.3 as it has reached end-of-life.
 
 
 ## Installation
@@ -188,7 +188,7 @@ fail on version 8.x of DB2.
 
 ## Known Limitations for the Python driver
 
-If trusted context is not set up, there will be two failures related to trusted context. When thick client has been used than additioanl three failures related to create, recreate DB.
+If trusted context is not set up, there will be two failures related to trusted context. When thick client has been used then additional three failures related to create, recreate DB.
 
 
 ## Known Limitations for the Python wrapper
