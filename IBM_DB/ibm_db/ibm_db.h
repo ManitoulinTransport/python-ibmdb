@@ -77,8 +77,15 @@
 #define PYTHON_DATE 10
 #define PYTHON_TIME 11
 #define PYTHON_TIMESTAMP 12
+#define PYTHON_LIST 13
+
+#define MAX_PRECISION 31
 
 #define ENABLE_NUMERIC_LITERALS 1 /* Enable CLI numeric literals */
+
+#ifndef SQL_ATTR_XML_DECLARATION
+#define SQL_ATTR_XML_DECLARATION 0
+#endif
 
 #ifndef SQL_XML
 #define SQL_XML -370

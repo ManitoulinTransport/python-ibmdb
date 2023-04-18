@@ -1,4 +1,125 @@
-2021-04-12, Version 3.0.4
+2022-11-24, Version 3.1.4
+=========================
+
+ * Fix for issues #796, #764 and added python 3.11 support (#809) (Earammak)
+
+ * Fix for issue #795 (#798) (Earammak)
+
+ * Fix for issue #792 (#794) (Earammak)
+
+ * Fix for pyhon issue #779 and #778 (#788) (Earammak)
+
+ * Add more explicit mention for Apple Silicon users (#780) (Jonathan Herdt)
+
+ * Added Py_BEGIN_ALLOW_THREADS and Py_END_ALLOW_THREADS for the API's (#781) (Earammak)
+
+2022-08-03, Version 3.1.3
+=========================
+
+ * Commit for version change 3.1.3 (#776) (Earammak)
+
+ * fix for install UnicodeDecodeError #772 (Bimal Jha)
+
+ * fix install issue #761, #765, #770 (Bimal Jha)
+
+ * Fix for path update and installation failure issue when IBM site down (#771) (Earammak)
+
+
+2022-06-13, Version 3.1.2
+=========================
+
+ * release changes for 3.1.2 (amukherjee)
+
+ * setup.py upgrade : better error handling while installation (Arnab Mukherjee)
+
+ * Code fix for issue #413 (Arnab Mukherjee)
+
+ * Code fix for issue #468 (Arnab Mukherjee)
+
+ * Code change for issue #720 (Arnab Mukherjee)
+
+ * documentation updates (Arnab Mukherjee)
+
+ * add custom clidriver bin path to ibm_db.py file (Alexandre Duverger)
+
+ * doc: update for issue #733 (Bimal Jha)
+
+ * fix: for issue #708 (Bimal Jha)
+
+ * doc: update about MacOS M1 Chip system (Bimal Jha)
+
+ * Add issue template (Bimal Jha)
+
+ * Add support for installing clidriver using another URL or artifactory URL. (#727) (MarcinMaciaszek)
+
+ * updating the CHANGES.md file (Arnab Mukherjee)
+
+
+2022-01-11, Version 3.1.1
+=========================
+
+ * Post release correction (Arnab Mukherjee)
+
+ * fixing the NULL initialization (Arnab Mukherjee)
+
+ * Changes for build fix with visual studio 2010 for python 3.4 and 2.7 (Arnab Mukherjee)
+
+ * fix for #427 adding readme for pypi site (Arnab Mukherjee)
+
+ * fix for #671 and restore python2 support (Arnab Mukherjee)
+
+ * Changes in Documentation (Arnab Mukherjee)
+
+ * Modification in readme--1 (Arnab Mukherjee)
+
+ * test case changes for ZOS (Arnab Mukherjee)
+
+ * correction in expectation (Arnab Mukherjee)
+
+ * correction in test case 2 (Arnab Mukherjee)
+
+ * correction in test case (Arnab Mukherjee)
+
+ * adding test cases as part of the PR #418 (Arnab Mukherjee)
+
+ * Changes from PR #689 and #407 (Arnab Mukherjee)
+
+ * adding test case for unicode (Arnab Mukherjee)
+
+ * Fixing the issue for fetch assoc (Arnab Mukherjee)
+
+ * Adding the logic for fixing unicode values in windows (Arnab Mukherjee)
+
+ * Fix for Unicode character (Arnab Mukherjee)
+
+ * Test case modification (Arnab Mukherjee)
+
+ * Support for arrays in python ibm_db driver (#698) (Praveen Narayanappa)
+
+
+2021-10-21, Version 3.1.0
+=========================
+
+ * changes for new release 3.1.0 (Arnab Mukherjee)
+
+ * Remove dependency on 2to3 and unpin Setuptools. (Jason R. Coombs)
+
+ * Restore Python 2 compatibility. (Jason R. Coombs)
+
+ * Apply lib2to3 to the python code (Jason R. Coombs)
+
+ * fix for #641 (Arnab Mukherjee)
+
+ * Pin to Setuptools < 58 to support builds until use_2to3 can be removed. (Jason R. Coombs)
+
+ * update readme.md for known installation issues (Arnab Mukherjee)
+
+ * updating: NOTES.md for more api (Arnab Mukherjee)
+
+ * Update: documentation update in NOTES.md (Arnab Mukherjee)
+
+
+2021-04-16, Version 3.0.4
 =========================
 
  * Update README with new release version (Bimal Kumar Jha)
@@ -48,10 +169,6 @@
  * fix: correct changes file (Bimal Jha)
 
  * upd: CHANGES (Bimal Jha)
-
-
-2021-02-03, Version 3.0.3
-=========================
 
  * deleting Install_z_ibm_db file (amukherjee)
 
