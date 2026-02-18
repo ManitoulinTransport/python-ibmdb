@@ -1921,6 +1921,8 @@ static PyObject *_python_ibm_db_connect_helper(PyObject *self, PyObject *args, i
     char server[2048];
     int isNewBuffer = 0;
     PyObject *pid = NULL;
+    PyObject *pidStr = NULL;
+    PyObject *threadIdStr = NULL;
     conn_alive = 1;
     if (!PyArg_ParseTuple(args, "OOO|OO", &databaseObj, &uidObj, &passwordObj, &options, &literal_replacementObj))
     {
@@ -1977,8 +1979,23 @@ static PyObject *_python_ibm_db_connect_helper(PyObject *self, PyObject *args, i
             }
             snprintf(messageStr, sizeof(messageStr), "Obtain process id: %p", pid);
             LogMsg(INFO, messageStr);
-            hKey = PyUnicode_Concat(hKey, PyUnicode_FromFormat("%ld", PyLong_AsLong(pid)));
+            pidStr = PyUnicode_FromFormat("%ld", PyLong_AsLong(pid));
+            if (pidStr == NULL)
+            {
+                Py_DECREF(pid);
+                return NULL;
+            }
+            hKey = PyUnicode_Concat(hKey, pidStr);
+            Py_DECREF(pidStr);
             Py_DECREF(pid);
+
+            threadIdStr = PyUnicode_FromFormat("%ld", (long)PyThread_get_thread_ident());
+            if (threadIdStr == NULL)
+            {
+                return NULL;
+            }
+            hKey = PyUnicode_Concat(hKey, threadIdStr);
+            Py_DECREF(threadIdStr);
 
             entry = PyDict_GetItem(persistent_list, hKey);
 
@@ -4274,7 +4291,8 @@ static PyObject *ibm_db_bind_param(PyObject *self, PyObject *args)
  *    Specifies an active DB2 client connection.
  *
  * ===Return Values
- * Returns TRUE on success or FALSE on failure.
+ * Returns TRUE on success. If the connection is already closed, returns TRUE.
+ * On failure, an exception is raised and NULL is returned.
  */
 static PyObject *ibm_db_close(PyObject *self, PyObject *args)
 {
@@ -4314,9 +4332,10 @@ static PyObject *ibm_db_close(PyObject *self, PyObject *args)
 
         if (!conn_res->handle_active)
         {
-            LogMsg(EXCEPTION, "Connection is not active");
-            PyErr_SetString(PyExc_Exception, "Connection is not active");
-            return NULL;
+            LogMsg(INFO, "Connection already closed; no action required");
+            Py_INCREF(Py_True);
+            LogMsg(INFO, "exit close()");
+            return Py_True;
         }
 
         if (conn_res->handle_active && !conn_res->flag_pconnect)
